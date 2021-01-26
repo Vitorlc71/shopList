@@ -39,8 +39,14 @@ const CustomDrawer = ({ navigation }) => {
                 justifyContent: 'center'
             }}>
                 <Text style={{ textAlign: 'center' }}>Bem Vindo</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                    <Icon name='shopping-basket' size={30} color='#609789' />
+                    <Icon name='shopping-cart' size={30} color='#609789' />
+                    <Icon name='apple' size={30} color='#609789' />
+                    <Icon name='calculator' size={30} color='#609789' />
+                </View>
             </View>
-            <View>
+            <View style={{ marginTop: 10 }}>
                 <DrawerItem labelStyle={{ fontSize: 17 }} icon={() => <Icon color='#609789' size={30} name='database' />} label='Listas Armazenadas' onPress={() => navigation.navigate('Listas Salvas')} />
             </View>
         </View>
