@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, TouchableWithoutFeedback, View, LogBox } from 'react-native'
+import { StyleSheet, Text, View, LogBox } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { Table, Row } from 'react-native-table-component'
 import DropShadow from 'react-native-drop-shadow'
@@ -7,6 +7,8 @@ import Gradient from 'react-native-linear-gradient'
 import Intl from 'intl'
 import 'intl/locale-data/jsonp/pt-BR'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import { CommonActions } from '@react-navigation/native'
+
 
 export default function LoadSelectedList({ route, navigation }) {
 
@@ -38,15 +40,21 @@ export default function LoadSelectedList({ route, navigation }) {
         <View style={styles.background}>
             <DropShadow style={styles.shadow}>
                 <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
-                    <Icon name='arrow-left' size={25} color='white' style={styles.back} onPress={() => navigation.goBack()} />
+                    <Icon name='arrow-left' size={25} color='white' style={styles.back} onPress={() => navigation.dispatch(CommonActions.reset({
+                        index: 0,
+                        routes: [{
+                            name: 'Listas Salvas'
+                        }]
+                    }
+                    ))} />
                     <Text style={{ color: 'white', fontSize: 18 }}>Sua lista</Text>
                 </Gradient>
             </DropShadow>
-            <Text style={styles.text}>Lista: {title}</Text>
-            <Text style={styles.text}>Data: {date}</Text>
+            <Text style={styles.text}>Lista:   {title}</Text>
+            <Text style={styles.text}>Data:   {date}</Text>
             <View style={styles.separate}></View>
             <Table>
-                <Row textStyle={styles.tableTitle} data={['Item', 'Qtd', 'Valor']} widthArr={[170, 100, 80]} />
+                <Row textStyle={styles.tableTitle} data={['Item', 'Qtd.', 'Valor']} widthArr={[170, 100, 80]} />
             </Table>
             <View style={styles.separate}></View>
             <ScrollView>
@@ -59,7 +67,7 @@ export default function LoadSelectedList({ route, navigation }) {
                 </Table>
                 <View style={styles.separate}></View>
                 <View style={styles.totalContainer}>
-                    <Text style={styles.total}>Valor total</Text><Text style={styles.total}>{format(total)}</Text>
+                    <Text style={styles.total}>Valor total:</Text><Text style={styles.total}>{format(total)}</Text>
                 </View>
             </ScrollView>
         </View>
@@ -77,7 +85,8 @@ const styles = StyleSheet.create({
         color: 'black',
         fontSize: 15,
         fontFamily: 'Arial',
-        marginLeft: 20
+        marginLeft: 20,
+        fontWeight: 'bold'
     },
     back: {
         position: 'absolute',
@@ -87,7 +96,7 @@ const styles = StyleSheet.create({
         color: 'black',
         fontSize: 15,
         fontFamily: 'Arial',
-        textAlign: 'auto'
+        textAlign: 'left'
     },
     title: {
         color: 'black',

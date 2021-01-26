@@ -20,6 +20,8 @@ import 'intl/locale-data/jsonp/pt-BR'
 import Gradient from 'react-native-linear-gradient'
 import { Table, Row } from 'react-native-table-component'
 import DropShadow from 'react-native-drop-shadow'
+import { CommonActions } from '@react-navigation/native'
+
 
 
 export default function App({ navigation, route }) {
@@ -37,21 +39,25 @@ export default function App({ navigation, route }) {
   const [newPrice, setNewPrice] = useState()
   const [ID, setID] = useState()
   const [totalPrice, setTotalPrice] = useState()
-  const [isVisible, setIsVisible] = useState(false)
   const [nameList, setNameList] = useState(route.params.nameList)
 
 
   useEffect(() => {
-    const total = tasks.reduce((acc, curr) => {
-      return acc + (curr.total || 0)
-    }, 0)
+    let isMounted = true
+    try {
+      const total = tasks.reduce((acc, curr) => {
+        return acc + (curr.total || 0)
+      }, 0)
 
-    setTotalPrice(total)
+      if (isMounted) {
+        setTotalPrice(total)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+
+    return () => isMounted = false
   }, [tasks])
-
-  const addItem = () => {
-    setVisibility(true)
-  }
 
   const format = (number) => Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 5 }).format(number)
 
@@ -83,7 +89,7 @@ export default function App({ navigation, route }) {
   }
 
   const saveEditTask = () => {
-    if(newDesc) {
+    if (newDesc) {
       const editedTask = {
         id: ID,
         desc: newDesc,
@@ -131,7 +137,15 @@ export default function App({ navigation, route }) {
 
       Alert.alert('Lista salva com sucesso!')
 
-      navigation.navigate('Home')
+      navigation.dispatch(CommonActions.reset({
+        index: 0,
+        routes: [
+          { name: 'Início' },
+          { name: 'Listas Salvas' },
+          { name: 'Menu' },
+        ]
+      }
+      ))
 
     } catch (error) {
       console.log(error.message)
@@ -223,7 +237,15 @@ export default function App({ navigation, route }) {
         <DropShadow style={styles.shadow}>
           <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
             <View style={styles.menu}>
-              <Icon style={styles.backButton} name='arrow-left' size={25} color='white' onPress={() => navigation.goBack()} />
+              <Icon style={styles.backButton} name='arrow-left' size={25} color='white' onPress={() => navigation.dispatch(CommonActions.reset({
+                index: 0,
+                routes: [
+                  { name: 'Início' },
+                  { name: 'Listas Salvas' },
+                  { name: 'Menu' },
+                ]
+              }
+              ))} />
             </View>
             <Text style={styles.nameList}>{nameList}</Text>
             <Icon style={styles.saveIcon} name='save' size={30} color='lightgreen' onPress={savePreList} />
@@ -245,7 +267,7 @@ export default function App({ navigation, route }) {
           </Table>
         </ScrollView>
 
-        <Icon style={styles.add} name="plus" size={70} onPress={addItem} />
+        <Icon style={styles.add} name="plus" size={70} onPress={() => setVisibility(true)} />
 
       </Gradient>
     </SafeAreaView>
@@ -281,7 +303,7 @@ const styles = StyleSheet.create({
   add: {
     position: 'absolute',
     marginLeft: 40,
-    color: 'darkblue',
+    color: '#163F4D',
     bottom: 30,
     right: 30
   },

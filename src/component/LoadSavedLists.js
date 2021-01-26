@@ -1,45 +1,49 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { ScrollView, StyleSheet, Text, TouchableWithoutFeedback } from 'react-native'
 import getRealm from './DatabaseRealm'
 import Gradient from 'react-native-linear-gradient'
 import DropShadow from 'react-native-drop-shadow'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import { CommonActions } from '@react-navigation/native'
+import { useFocusEffect } from '@react-navigation/native'
 
 
 export default function LoadSavedLists({ navigation }) {
 
     const [lists, setLists] = useState([])
 
-    useEffect(() => {
+    useFocusEffect(
+        useCallback(() => {
 
-        let isMounted = true
+            let isMounted = true
 
-        async function buscar() {
-            try {
-                const realm = await getRealm()
+            async function buscar() {
+                try {
+                    const realm = await getRealm()
 
-                const data = realm.objects('ListsSchema')
+                    const data = realm.objects('ListsSchema')
 
-                if (isMounted) {
-                    setLists(data)
+                    if (isMounted) {
+                        setLists(data)
+                    }
+
+                } catch (error) {
+                    console.log(error)
                 }
-
-            } catch (error) {
-                console.log(error)
             }
-        }
-        buscar()
+            buscar()
 
-        return () => isMounted = false
+            return () => isMounted = false
 
-    }, [lists])
+        }, [lists])
+    )
 
 
-    const handleDelete = async (name) => {
+    const handleDelete = async (id) => {
         try {
             const realm = await getRealm()
 
-            const filteredList = lists.filter(e => e.titulo === name)
+            const filteredList = lists.filter(e => e.id === id)
 
             realm.write(() => {
                 realm.delete(filteredList)
@@ -51,8 +55,11 @@ export default function LoadSavedLists({ navigation }) {
 
 
     const selectedList = async (list) => {
-        navigation.push('SelectedList', {
-            titulo: list
+        navigation.navigate('Menu', {
+            screen: 'SelectedList',
+            params: {
+                titulo: list
+            }
         })
     }
 
@@ -60,8 +67,16 @@ export default function LoadSavedLists({ navigation }) {
         <Gradient colors={['#163F4D', '#609789']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.background}>
             <DropShadow style={styles.shadow}>
                 <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
-                    <Icon style={styles.backIcon} name='arrow-left' size={25} color='white' onPress={() => navigation.goBack()} />
-                    <Text style={styles.text}>Suas listas</Text>
+                    <Icon style={styles.backIcon} name='arrow-left' size={25} color='white' onPress={() => navigation.dispatch(CommonActions.reset({
+                        index: 0,
+                        routes: [
+                            { name: 'Início' },
+                            { name: 'Listas Salvas' },
+                            { name: 'Menu' },
+                        ]
+                    }
+                    ))} />
+                    <Text style={styles.text}>Armazenadas</Text>
                 </Gradient>
             </DropShadow>
 
@@ -70,7 +85,7 @@ export default function LoadSavedLists({ navigation }) {
                     return (
                         <DropShadow key={i} style={styles.shadowItem}>
                             <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.listItem}>
-                                <TouchableWithoutFeedback onLongPress={() => handleDelete(list.titulo)} onPress={() => selectedList(list)}>
+                                <TouchableWithoutFeedback onLongPress={() => handleDelete(list.id)} onPress={() => selectedList(list)}>
                                     <Text style={styles.list}>{list.titulo}</Text>
                                 </TouchableWithoutFeedback>
                             </Gradient>

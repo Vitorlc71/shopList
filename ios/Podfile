@@ -8,6 +8,8 @@ target 'newShopList' do
 
   use_react_native!(:path => config["reactNativePath"])
 
+  pod 'react-native-progress-bar-android', :path => '../node_modules/@react-native-community/progress-bar-android'
+
   target 'newShopListTests' do
     inherit! :complete
     # Pods for testing

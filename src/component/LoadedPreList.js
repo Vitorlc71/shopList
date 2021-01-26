@@ -21,6 +21,7 @@ import Gradient from 'react-native-linear-gradient'
 import { Table, Row } from 'react-native-table-component'
 import DropShadow from 'react-native-drop-shadow'
 import Toast from 'react-native-toast-message'
+import { CommonActions } from '@react-navigation/native'
 
 
 export default function LoadedPreList({ navigation, route }) {
@@ -44,16 +45,25 @@ export default function LoadedPreList({ navigation, route }) {
     const [id, setId] = useState()
 
     useEffect(() => {
+        let isMounted = true
         const getLoadList = async () => {
+            try {
+                const realm = await getRealm()
 
-            const realm = await getRealm()
+                const data = realm.objects('PreListSchema').filtered(`titulo = "${nameList}"`)
 
-            const data = realm.objects('PreListSchema').filtered(`titulo = "${nameList}"`)
-            setItems(data[0].items)
-            setId(data[0].id)
+                if (isMounted) {
+                    setItems(data[0].items)
+                    setId(data[0].id)
+                }
+            } catch (error) {
+                console.log(error)
+            }
 
         }
         getLoadList()
+
+        return () => isMounted = false
 
     }, [])
 
@@ -127,19 +137,23 @@ export default function LoadedPreList({ navigation, route }) {
 
             Alert.alert('Lista salva com sucesso!')
 
-            navigation.goBack()
+            navigation.dispatch(CommonActions.reset({
+                index: 0,
+                routes: [
+                    { name: 'Início' },
+                    { name: 'Listas Salvas' },
+                    { name: 'Menu' },
+                ]
+            }
+            ))
 
         } catch (error) {
             console.log(error.message)
         }
     }
 
-    const addItem = () => {
-        setVisibility(true)
-    }
-
     const saveNewTask = () => {
-        if(description) {
+        if (description) {
             const newItems = {
                 id: Math.floor(Math.random() * 65536),
                 description: description,
@@ -147,7 +161,7 @@ export default function LoadedPreList({ navigation, route }) {
                 price: price || '0',
                 total: quantidade * price || 0
             }
-    
+
             setItems([...items, newItems])
             setVisibility(false)
             setDescription()
@@ -167,7 +181,7 @@ export default function LoadedPreList({ navigation, route }) {
     }
 
     const saveEditTask = () => {
-        if(newDesc) {
+        if (newDesc) {
             const editedItems = {
                 id: newID,
                 description: newDesc,
@@ -243,7 +257,15 @@ export default function LoadedPreList({ navigation, route }) {
                 <DropShadow style={styles.shadow}>
                     <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
                         <View style={styles.menu}>
-                            <Icon name='arrow-left' size={25} color='white' onPress={() => navigation.goBack()} />
+                            <Icon name='arrow-left' size={25} color='white' onPress={() => navigation.dispatch(CommonActions.reset({
+                                index: 0,
+                                routes: [
+                                    { name: 'Início' },
+                                    { name: 'Listas Salvas' },
+                                    { name: 'Menu' },
+                                ]
+                            }
+                            ))} />
                         </View>
                         <Text style={styles.nameList}>{nameList}</Text>
                         <Icon style={styles.saveIcon} name='save' size={30} color='lightgreen' onPress={savePreList} />
@@ -266,7 +288,7 @@ export default function LoadedPreList({ navigation, route }) {
                     </Table>
                 </ScrollView>
 
-                <Icon style={styles.add} name="plus" size={70} onPress={addItem} />
+                <Icon style={styles.add} name="plus" size={70} onPress={() => setVisibility(true)} />
 
             </Gradient>
         </SafeAreaView>
@@ -353,7 +375,7 @@ const styles = StyleSheet.create({
     add: {
         position: 'absolute',
         marginLeft: 40,
-        color: 'darkblue',
+        color: '#163F4D',
         bottom: 30,
         right: 30
     },

@@ -1,5 +1,5 @@
 {
-  "name": "newShopList",
+  "name": "newshoplist",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -13,6 +13,7 @@
     "@fortawesome/react-native-fontawesome": "^0.2.6",
     "@react-native-community/checkbox": "^0.5.5",
     "@react-native-community/masked-view": "^0.1.10",
+    "@react-navigation/drawer": "^5.12.2",
     "@react-navigation/native": "^5.8.10",
     "@react-navigation/stack": "^5.12.8",
     "intl": "^1.2.5",
@@ -25,6 +26,7 @@
     "react-native-gesture-handler": "^1.9.0",
     "react-native-linear-gradient": "^2.5.6",
     "react-native-modal-datetime-picker": "^9.1.0",
+    "react-native-paper": "^4.7.1",
     "react-native-reanimated": "^1.13.2",
     "react-native-safe-area-context": "^3.1.9",
     "react-native-screens": "^2.15.0",
