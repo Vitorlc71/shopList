@@ -21,12 +21,11 @@ import Gradient from 'react-native-linear-gradient'
 import { Table, Row } from 'react-native-table-component'
 import DropShadow from 'react-native-drop-shadow'
 import { CommonActions } from '@react-navigation/native'
+import Toast from 'react-native-toast-message'
 
 
 
 export default function App({ navigation, route }) {
-
-  const date = moment().locale('pt-br').format('D     MM    YYYY')
 
   const [tasks, setTasks] = useState([])
   const [visibility, setVisibility] = useState(false)
@@ -76,7 +75,10 @@ export default function App({ navigation, route }) {
       setqtd()
       setPrice()
     } else {
-      Alert.alert('Campo descrição não pode ficar em branco')
+      Toast.show({
+        type: 'error',
+        text1: 'Campo descrição não pode ficar vazio!'
+      })
     }
   }
 
@@ -101,7 +103,10 @@ export default function App({ navigation, route }) {
       setTasks([...filteredTask, editedTask])
       setEditVisibility(false)
     } else {
-      Alert.alert('Campo descrição não pode ficar em branco.')
+      Toast.show({
+        type: 'error',
+        text1: 'Campo descrição não pode ficar vazio!'
+      })
     }
   }
 
@@ -110,48 +115,47 @@ export default function App({ navigation, route }) {
     setTasks(deleted)
   }
 
-  const archiveList = async () => {
-    try {
+  // const archiveList = async () => {
+  //   try {
 
-      const realm = await getRealm()
+  //     const realm = await getRealm()
 
-      realm.write(() => {
-        const list = tasks.map(e => {
-          return {
-            id: e.id,
-            description: e.desc,
-            quantidade: e.quant,
-            price: e.price,
-            total: e.price * e.quant
-          }
-        })
+  //     realm.write(() => {
+  //       const list = tasks.map(e => {
+  //         return {
+  //           id: e.id,
+  //           description: e.desc,
+  //           quantidade: e.quant,
+  //           price: e.price,
+  //           total: e.price * e.quant
+  //         }
+  //       })
 
-        realm.create('ListsSchema', {
-          id: Math.floor(Math.random() * 65536),
-          titulo: nameList,
-          date: moment().locale('pt-br').format('DD-MM-YYYY'),
-          total: totalPrice,
-          items: list
-        })
-      })
+  //       realm.create('ListsSchema', {
+  //         id: Math.floor(Math.random() * 65536),
+  //         titulo: nameList,
+  //         date: moment().locale('pt-br').format('DD / MM / YYYY'),
+  //         total: totalPrice,
+  //         items: list
+  //       })
+  //     })
 
-      Alert.alert('Lista salva com sucesso!')
+  //     Alert.alert('Lista salva com sucesso!')
 
-      navigation.dispatch(CommonActions.reset({
-        index: 0,
-        routes: [
-          { name: 'Início' },
-          { name: 'Listas Salvas' },
-          { name: 'Menu' },
-        ]
-      }
-      ))
+  //     navigation.dispatch(CommonActions.reset({
+  //       index: 0,
+  //       routes: [
+  //         { name: 'Início' },
+  //         { name: 'Listas Salvas' },
+  //       ]
+  //     }
+  //     ))
 
-    } catch (error) {
-      console.log(error.message)
-    }
-    setNameList()
-  }
+  //   } catch (error) {
+  //     console.log(error.message)
+  //   }
+  //   setNameList()
+  // }
 
   const savePreList = async () => {
     try {
@@ -171,13 +175,21 @@ export default function App({ navigation, route }) {
         realm.create('PreListSchema', {
           id: Math.floor(Math.random() * 65536),
           titulo: nameList,
-          date: moment().locale('pt-br').format('DD-MM-YYYY'),
+          date: moment().locale('pt-br').format('DD / MM / YYYY'),
           total: totalPrice,
           items: list
-        })
+        }, 'modified')
       })
 
-      Alert.alert('Salvo na pré lista!')
+      navigation.dispatch(CommonActions.reset({
+        index: 0,
+        routes: [
+          { name: 'Início' },
+          { name: 'Listas Salvas' },
+        ]
+      }
+      ))
+
     } catch (error) {
       console.log(error)
     }
@@ -194,6 +206,7 @@ export default function App({ navigation, route }) {
                 <Text style={styles.text}>Novo Item</Text>
               </Gradient>
             </DropShadow>
+            <Toast ref={ref => Toast.setRef(ref)} />
             <TextInput style={styles.input} autoFocus placeholder='Descrição do item...' value={value} onChangeText={e => setValue(e)} />
             <TextInput style={styles.input} keyboardType='numeric' keyboardAppearance='dark' placeholder='Quantidade...' value={qtd} onChangeText={(e) => setqtd(e)} />
             <TextInput style={styles.input} keyboardType='decimal-pad' placeholder='Valor' value={price} onChangeText={e => setPrice(e)} />
@@ -242,16 +255,15 @@ export default function App({ navigation, route }) {
                 routes: [
                   { name: 'Início' },
                   { name: 'Listas Salvas' },
-                  { name: 'Menu' },
                 ]
               }
               ))} />
             </View>
             <Text style={styles.nameList}>{nameList}</Text>
             <Icon style={styles.saveIcon} name='save' size={30} color='lightgreen' onPress={savePreList} />
-            <Icon style={styles.archiveIcon} name='archive' size={30} color='#FFD700' onPress={archiveList} />
           </Gradient>
         </DropShadow>
+        <Toast ref={ref => Toast.setRef(ref)} />
         <Text style={{ color: 'white', fontSize: 18, textAlign: 'center' }}>Nova lista</Text>
         <Text style={styles.totalPrice}><Icon name='shopping-cart' size={27} color='lightgreen' />   {format(totalPrice)}</Text>
         <Table>
@@ -357,8 +369,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignSelf: 'center',
     position: 'absolute',
-    width: 190,
-    left: 70
+    width: '70%',
+    right: '15%'
   },
   totalPrice: {
     color: 'white',
@@ -394,7 +406,7 @@ const styles = StyleSheet.create({
   saveIcon: {
     alignSelf: 'center',
     position: 'absolute',
-    right: 70
+    right: 20
   },
   archiveIcon: {
     alignSelf: 'center',

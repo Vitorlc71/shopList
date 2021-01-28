@@ -14,36 +14,38 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 const Stack = createStackNavigator()
 const Drawer = createDrawerNavigator()
 
-function Menu() {
-    return (
-        <Stack.Navigator
-            initialRouteName='Início'
-            screenOptions={{
-                headerShown: false
-            }}>
-            <Stack.Screen name='CreateList' component={CreateList} />
-            <Stack.Screen name='LoadedPreList' component={LoadedPreList} />
-            <Stack.Screen name='SelectedList' component={LoadSelectedList} />
-            <Stack.Screen name='Início' component={OpenScreen} />
-        </Stack.Navigator>
-    )
-}
-
 const CustomDrawer = ({ navigation }) => {
     return (
         <View>
             <View style={{
-                height: 70,
+                height: 100,
                 width: '100%',
-                backgroundColor: 'lightblue',
+                backgroundColor: '#609789',
                 justifyContent: 'center'
             }}>
-                <Text style={{ textAlign: 'center' }}>Bem Vindo</Text>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                    <Icon name='shopping-basket' size={30} color='#609789' />
-                    <Icon name='shopping-cart' size={30} color='#609789' />
-                    <Icon name='apple' size={30} color='#609789' />
-                    <Icon name='calculator' size={30} color='#609789' />
+                <Text style={{
+                    textAlign: 'center',
+                    fontSize: 30,
+                    fontWeight: 'bold',
+                    alignSelf: 'center',
+                    position: 'absolute',
+                    zIndex: 7,
+                    color: 'white',
+                    textShadowColor: 'black',
+                    textShadowOffset: {
+                        width: 3,
+                        height: 3
+                    },
+                    shadowOpacity: 0.5,
+                    textShadowRadius: 4,
+                }}>
+                    Bem Vindo
+                </Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', opacity: 0.4 }}>
+                    <Icon name='shopping-cart' size={60} color='#163F4D' />
+                    <Icon name='shopping-basket' size={50} color='#163F4D' />
+                    <Icon name='apple' size={60} color='#163F4D' />
+                    <Icon name='calculator' size={50} color='#163F4D' />
                 </View>
             </View>
             <View style={{ marginTop: 10 }}>
@@ -59,7 +61,9 @@ export default function index() {
             <Drawer.Navigator drawerContent={CustomDrawer} initialRouteName='Início'>
                 <Drawer.Screen name='Início' component={OpenScreen} />
                 <Drawer.Screen name='Listas Salvas' component={LoadSavedLists} />
-                <Drawer.Screen name='Menu' component={Menu} />
+                <Drawer.Screen name='CreateList' component={CreateList} />
+                <Drawer.Screen name='LoadedPreList' component={LoadedPreList} />
+                <Drawer.Screen name='SelectedList' component={LoadSelectedList} />
             </Drawer.Navigator>
         </NavigationContainer>
     )

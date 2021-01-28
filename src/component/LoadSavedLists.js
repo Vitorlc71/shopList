@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from 'react'
-import { ScrollView, StyleSheet, Text, TouchableWithoutFeedback } from 'react-native'
+import { ScrollView, StyleSheet, Text, TouchableWithoutFeedback, SafeAreaView, View, ImageBackground } from 'react-native'
 import getRealm from './DatabaseRealm'
 import Gradient from 'react-native-linear-gradient'
 import DropShadow from 'react-native-drop-shadow'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { CommonActions } from '@react-navigation/native'
 import { useFocusEffect } from '@react-navigation/native'
+import image from '../../img/arquivar.png'
 
 
 export default function LoadSavedLists({ navigation }) {
@@ -55,45 +56,46 @@ export default function LoadSavedLists({ navigation }) {
 
 
     const selectedList = async (list) => {
-        navigation.navigate('Menu', {
-            screen: 'SelectedList',
-            params: {
-                titulo: list
-            }
+        navigation.navigate('SelectedList', {
+            titulo: list
         })
     }
 
     return (
-        <Gradient colors={['#163F4D', '#609789']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.background}>
-            <DropShadow style={styles.shadow}>
-                <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
-                    <Icon style={styles.backIcon} name='arrow-left' size={25} color='white' onPress={() => navigation.dispatch(CommonActions.reset({
-                        index: 0,
-                        routes: [
-                            { name: 'Início' },
-                            { name: 'Listas Salvas' },
-                            { name: 'Menu' },
-                        ]
-                    }
-                    ))} />
-                    <Text style={styles.text}>Armazenadas</Text>
-                </Gradient>
-            </DropShadow>
+        <SafeAreaView style={styles.background}>
+            <ImageBackground blurRadius={2} imageStyle={{ opacity: 0.5 }} resizeMode='contain' style={{ width: '100%', height: '100%' }} source={image}>
+                <DropShadow style={styles.shadow}>
+                    <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
+                        <Icon style={styles.backIcon} name='arrow-left' size={25} color='white' onPress={() => navigation.dispatch(CommonActions.reset({
+                            index: 0,
+                            routes: [
+                                { name: 'Início' },
+                                { name: 'Listas Salvas' },
+                            ]
+                        }
+                        ))} />
+                        <Text style={styles.text}>Armazenadas</Text>
+                    </Gradient>
+                </DropShadow>
 
-            <ScrollView style={{ width: '100%' }}>
-                {lists.map((list, i) => {
-                    return (
-                        <DropShadow key={i} style={styles.shadowItem}>
-                            <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.listItem}>
-                                <TouchableWithoutFeedback onLongPress={() => handleDelete(list.id)} onPress={() => selectedList(list)}>
-                                    <Text style={styles.list}>{list.titulo}</Text>
-                                </TouchableWithoutFeedback>
-                            </Gradient>
-                        </DropShadow>
-                    )
-                })}
-            </ScrollView>
-        </Gradient>
+                <ScrollView style={{ width: '100%' }}>
+                    {lists.map((list, i) => {
+                        return (
+                            <DropShadow key={i} style={styles.shadowItem}>
+                                <View style={styles.listItem}>
+                                    <TouchableWithoutFeedback onLongPress={() => handleDelete(list.id)} onPress={() => selectedList(list)}>
+                                        <View style={styles.containerList}>
+                                            <Text style={styles.list}>{list.titulo}</Text>
+                                            <Text style={styles.dateList}>{list.date}</Text>
+                                        </View>
+                                    </TouchableWithoutFeedback>
+                                </View>
+                            </DropShadow>
+                        )
+                    })}
+                </ScrollView>
+            </ImageBackground>
+        </SafeAreaView>
     )
 }
 
@@ -112,10 +114,10 @@ const styles = StyleSheet.create({
         position: 'absolute'
     },
     list: {
-        color: 'white',
-        fontSize: 17,
+        color: 'gray',
+        fontSize: 18,
         fontFamily: 'Open Sans',
-        textAlign: 'center'
+        marginLeft: 10
     },
     back: {
         color: 'white',
@@ -141,22 +143,35 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     },
     listItem: {
-        width: '90%',
-        height: 30,
+        width: '95%',
+        height: 50,
         marginBottom: 10,
+        borderRadius: 5,
+        justifyContent: 'center',
+        backgroundColor: 'white'
     },
     shadowItem: {
         shadowColor: 'black',
         shadowOffset: {
-            width: 0,
+            width: 1,
             height: 3
         },
-        shadowOpacity: 0.5,
-        shadowRadius: 4,
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
         alignItems: 'center'
     },
     backIcon: {
         marginLeft: 20,
         right: 170
+    },
+    containerList: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    dateList: {
+        color: 'gray',
+        fontSize: 15,
+        fontFamily: 'Open Sans',
+        marginRight: 10
     }
 })

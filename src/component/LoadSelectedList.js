@@ -47,7 +47,7 @@ export default function LoadSelectedList({ route, navigation }) {
                         }]
                     }
                     ))} />
-                    <Text style={{ color: 'white', fontSize: 18 }}>Sua lista</Text>
+                    <Text style={{ color: 'white', fontSize: 20 }}>Sua lista</Text>
                 </Gradient>
             </DropShadow>
             <Text style={styles.text}>Lista:   {title}</Text>

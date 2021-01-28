@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import {
     Text,
     TextInput,
@@ -8,7 +8,8 @@ import {
     Modal,
     View,
     ScrollView,
-    TouchableWithoutFeedback,
+    ImageBackground,
+    Image,
 } from 'react-native'
 import Gradient from 'react-native-linear-gradient'
 import DropShadow from 'react-native-drop-shadow'
@@ -16,12 +17,16 @@ import Toast from 'react-native-toast-message'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import getRealm from './DatabaseRealm'
 import { useFocusEffect } from '@react-navigation/native'
+import image from '../../img/carrinhoRed3.png'
 
 export default function OpenScreen({ navigation }) {
 
     const [newName, setNewName] = useState()
     const [isVisible, setIsVisible] = useState(false)
     const [nameList, setNameList] = useState([])
+    const [toDelStore, setToDelStore] = useState()
+    const [modalButtons, setModalButtons] = useState(false)
+    const [title, setTitle] = useState('')
 
     useFocusEffect(
         useCallback(() => {
@@ -50,14 +55,64 @@ export default function OpenScreen({ navigation }) {
         )
     )
 
-    const deleteList = async (list) => {
-        const realm = await getRealm()
-        const selectedList = nameList.filter(e => e.titulo === list.titulo)
+    const deleteList = async () => {
+        try {
+            const realm = await getRealm()
+            const selectedList = nameList.filter(e => e.id === toDelStore.id)
 
-        realm.write(() => {
-            realm.delete(selectedList)
-        })
+            realm.write(() => {
+                realm.delete(selectedList)
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
+
+    const handleStorage = async () => {
+        try {
+
+            const realm = await getRealm()
+
+            realm.write(() => {
+                const list = toDelStore.items.map(e => {
+                    return {
+                        id: e.id,
+                        description: e.description,
+                        quantidade: e.quantidade,
+                        price: e.price,
+                        total: e.total
+                    }
+                })
+
+                realm.create('ListsSchema', {
+                    id: toDelStore.id,
+                    titulo: toDelStore.titulo,
+                    date: toDelStore.date,
+                    total: toDelStore.total,
+                    items: list
+                })
+
+                const toRemove = realm.objects('PreListSchema').filtered(`id = "${toDelStore.id}"`)
+                realm.delete(toRemove[0])
+            })
+
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleCloseOptionList = () => {
+        setModalButtons(false)
+        setToDelStore()
+    }
+
+    const handleOptionsList = list => {
+        setToDelStore(list)
+        setTitle(list.titulo)
+        setModalButtons(true)
+    }
+
 
     const ProgressBar = ({ value, value2 }) => {
         return (
@@ -79,77 +134,116 @@ export default function OpenScreen({ navigation }) {
 
     return (
         <SafeAreaView style={styles.background}>
-            <Modal transparent={true} visible={isVisible}>
-                <View style={styles.backgroundModal}>
-                    <Toast ref={ref => Toast.setRef(ref)} />
-                    <View style={styles.modalView}>
-                        <Text style={{ color: 'white', textAlign: 'center', fontSize: 20, marginTop: 10 }}>Nova lista</Text>
-                        <TextInput style={styles.textInput} autoFocus={true} placeholder='Nome da lista' value={newName} onChangeText={(e) => setNewName(e)} />
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                            <TouchableOpacity onPress={() => {
-                                setIsVisible(false)
-                                setNewName()
-                            }}>
-                                <Text style={styles.closeModal}>Cancelar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity activeOpacity={0.7} onPress={() => {
-                                if (newName) {
-                                    navigation.navigate('Menu', {
-                                        screen: 'CreateList',
-                                        params: {
+            <ImageBackground blurRadius={2} imageStyle={{ opacity: 0.5 }} resizeMode='contain' source={image} style={{ width: '100%', height: '100%' }}>
+                <Modal transparent={true} visible={isVisible}>
+                    <View style={styles.backgroundModal}>
+                        <Toast ref={ref => Toast.setRef(ref)} />
+                        <View style={styles.modalView}>
+                            <Text style={{ color: 'white', textAlign: 'center', fontSize: 20, marginTop: 10 }}>Nova lista</Text>
+                            <TextInput style={styles.textInput} autoFocus={true} placeholder='Nome da lista' value={newName} onChangeText={(e) => setNewName(e)} />
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                                <TouchableOpacity onPress={() => {
+                                    setIsVisible(false)
+                                    setNewName()
+                                }}>
+                                    <Text style={styles.closeModal}>Cancelar</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                                    if (newName) {
+                                        navigation.navigate('CreateList', {
                                             nameList: newName
                                         }
+                                        )
+                                        setNewName()
+                                        setIsVisible(false)
+                                    } else {
+                                        Toast.show({
+                                            type: 'error',
+                                            text1: 'Informe um nome para sua lista.',
+                                            text2: 'Será mais fácil identificar posteriormente.'
+                                        })
+                                        return
                                     }
-                                    )
-                                    setNewName()
-                                    setIsVisible(false)
-                                } else {
-                                    Toast.show({
-                                        type: 'error',
-                                        text1: 'Informe um nome para sua lista.',
-                                        text2: 'Será mais fácil identificar posteriormente.'
-                                    })
-                                    return
-                                }
-                            }}>
-                                <Text style={styles.buttonCreate}>Criar lista</Text>
-                            </TouchableOpacity>
+                                }}>
+                                    <Text style={styles.buttonCreate}>Criar lista</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
-                </View>
-            </Modal>
+                </Modal>
 
-            <DropShadow style={styles.shadow}>
-                <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
-                    <Icon style={{ position: 'absolute', left: 20 }} name='bars' size={30} color='white' onPress={() => navigation.toggleDrawer()} />
-                    <Text style={styles.title}>Minhas listas</Text>
-                </Gradient>
-            </DropShadow>
+                <DropShadow style={styles.shadow}>
+                    <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
+                        <Icon style={{ position: 'absolute', left: 20 }} name='bars' size={30} color='white' onPress={() => navigation.toggleDrawer()} />
+                        <Text style={styles.title}>Minhas listas</Text>
+                    </Gradient>
+                </DropShadow>
 
-            <View style={styles.containerList}>
-                {nameList.map((e, i) => {
-                    return (
-                        <TouchableWithoutFeedback key={i} onLongPress={() => deleteList(e)} onPress={() => navigation.navigate('Menu', {
-                            screen: 'LoadedPreList',
-                            params: {
+                <Modal transparent={true} visible={modalButtons}>
+                    <View onTouchEndCapture={handleCloseOptionList} style={styles.saveDelButtonsContainer}>
+                        <DropShadow style={{
+                            shadowColor: 'black',
+                            shadowOffset: {
+                                width: 2,
+                                height: 4
+                            },
+                            shadowOpacity: 0.2,
+                            shadowRadius: 3,
+                            width: '100%'
+                        }}>
+                            <Text style={{
+                                backgroundColor: '#609789',
+                                width: '70%',
+                                height: 40,
+                                textAlign: 'center',
+                                borderTopLeftRadius: 7,
+                                borderTopRightRadius: 7,
+                                paddingTop: 10,
+                                fontSize: 20,
+                                color: 'white',
+                                alignSelf: 'center'
+                            }}>{title}</Text>
+                            <View style={{
+                                width: '70%',
+                                height: 120,
+                                backgroundColor: 'white',
+                                alignItems: 'center',
+                                justifyContent: 'space-around',
+                                flexDirection: 'row',
+                                borderBottomLeftRadius: 7,
+                                borderBottomRightRadius: 7,
+                                alignSelf: 'center'
+                            }}>
+
+                                <Icon onPress={handleStorage} name='archive' size={50} color='#609789' />
+                                <Icon onPress={deleteList} name='trash' size={50} color='#609789' />
+                            </View>
+                        </DropShadow>
+                    </View>
+                </Modal>
+
+                <ScrollView style={styles.containerList}>
+                    {nameList.map((e, i) => {
+                        return (
+                            <TouchableOpacity activeOpacity={0.5} key={i} onLongPress={() => handleOptionsList(e)} onPress={() => navigation.navigate('LoadedPreList', {
                                 name: e.titulo
-                            }
-                        })}>
-                            <DropShadow style={styles.shadowItemContainer}>
-                                <View style={styles.containerShadow}>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <Text style={styles.nameList}>{e.titulo}</Text>
-                                        <Text style={{ color: '#163F4D', position: 'absolute', right: 10, fontSize: 20 }}>{e.items.filter(e => e.price != 0).length}/{e.items.length}</Text>
+                            })}>
+                                <DropShadow style={styles.shadowItemContainer}>
+                                    <View style={styles.containerShadow}>
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <Text style={styles.nameList}>{e.titulo}</Text>
+                                            <Text style={{ color: '#163F4D', position: 'absolute', right: 10, fontSize: 20 }}>{e.items.filter(e => e.price != 0).length}/{e.items.length}</Text>
+                                        </View>
+                                        <ProgressBar value2={e.items.length} value={e.items.filter(e => e.price != 0).length} />
                                     </View>
-                                    <ProgressBar value2={e.items.length} value={e.items.filter(e => e.price != 0).length} />
-                                </View>
-                            </DropShadow>
-                        </TouchableWithoutFeedback>
-                    )
-                })}
-            </View>
+                                </DropShadow>
+                            </TouchableOpacity>
+                        )
+                    })}
+                </ScrollView>
 
-            <Icon style={styles.icon} name='plus' size={50} color='#609789' onPress={() => setIsVisible(true)} />
+                <Icon style={styles.icon} name='plus' size={50} color='#609789' onPress={() => setIsVisible(true)} />
+            </ImageBackground>
         </SafeAreaView>
     )
 }
@@ -157,7 +251,6 @@ export default function OpenScreen({ navigation }) {
 const styles = StyleSheet.create({
     background: {
         flex: 1,
-        alignItems: 'center',
         width: '100%',
         height: '100%',
     },
@@ -189,7 +282,8 @@ const styles = StyleSheet.create({
         height: 70,
         alignItems: 'center',
         justifyContent: 'center',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginBottom: 5
     },
     buttonContainer: {
         width: 150,
@@ -234,13 +328,12 @@ const styles = StyleSheet.create({
     },
     icon: {
         position: 'absolute',
-        bottom: 20,
-        right: 30
+        bottom: 50,
+        right: 40
     },
     containerList: {
         width: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
+        height: '100%'
     },
     nameList: {
         color: 'black',
@@ -262,10 +355,28 @@ const styles = StyleSheet.create({
     containerShadow: {
         width: '95%',
         height: 70,
-        marginTop: 10,
+        marginTop: 5,
+        marginBottom: 5,
         borderRadius: 4,
         justifyContent: 'center',
         backgroundColor: 'white',
+        alignSelf: 'center',
+        padding: 10,
+    },
+    saveDelButtonsContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    selected: {
+        width: '95%',
+        height: 70,
+        marginTop: 5,
+        marginBottom: 5,
+        borderRadius: 4,
+        justifyContent: 'center',
+        backgroundColor: 'red',
         alignSelf: 'center',
         padding: 10,
     }

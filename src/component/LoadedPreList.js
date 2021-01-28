@@ -68,9 +68,12 @@ export default function LoadedPreList({ navigation, route }) {
     }, [])
 
     useEffect(() => {
+        let isMounted = true
         setTotalPrice(items.map(e => e.total).reduce((acc, curr) => {
             return acc + curr
         }, 0))
+
+        return () => isMounted = false
     }, [items])
 
     const format = (number) => Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 5 }).format(number)
@@ -94,61 +97,19 @@ export default function LoadedPreList({ navigation, route }) {
                 realm.create('PreListSchema', {
                     id: id,
                     titulo: nameList,
-                    date: moment().locale('pt-br').format('DD-MM-YYYY'),
+                    date: moment().locale('pt-br').format('DD / MM / YYYY'),
                     total: totalPrice,
                     items: list
                 }, 'modified')
             })
 
-            Alert.alert('Salvo na pré lista!')
+            Toast.show({
+                type: 'success',
+                text1: 'Pré-lista salva!',
+                topOffset: 50
+            })
         } catch (error) {
             console.log(error)
-        }
-    }
-
-    const archiveList = async () => {
-        try {
-
-            const realm = await getRealm()
-
-            realm.write(() => {
-                const list = items.map(e => {
-                    return {
-                        id: e.id,
-                        description: e.description,
-                        quantidade: e.quantidade,
-                        price: e.price,
-                        total: e.price * e.quantidade
-                    }
-                })
-
-                realm.create('ListsSchema', {
-                    id: id,
-                    titulo: nameList,
-                    date: moment().locale('pt-br').format('DD-MM-YYYY'),
-                    total: totalPrice,
-                    items: list
-                }, 'modified')
-
-                const removeList = realm.objects('PreListSchema').filtered(`id = "${id}"`)
-                realm.delete(removeList)
-            })
-
-
-            Alert.alert('Lista salva com sucesso!')
-
-            navigation.dispatch(CommonActions.reset({
-                index: 0,
-                routes: [
-                    { name: 'Início' },
-                    { name: 'Listas Salvas' },
-                    { name: 'Menu' },
-                ]
-            }
-            ))
-
-        } catch (error) {
-            console.log(error.message)
         }
     }
 
@@ -262,22 +223,20 @@ export default function LoadedPreList({ navigation, route }) {
                                 routes: [
                                     { name: 'Início' },
                                     { name: 'Listas Salvas' },
-                                    { name: 'Menu' },
                                 ]
                             }
                             ))} />
                         </View>
                         <Text style={styles.nameList}>{nameList}</Text>
                         <Icon style={styles.saveIcon} name='save' size={30} color='lightgreen' onPress={savePreList} />
-                        <Icon style={styles.archiveIcon} name='archive' size={30} color='#FFD700' onPress={archiveList} />
                     </Gradient>
                 </DropShadow>
+                <Toast ref={ref => Toast.setRef(ref)} />
                 <Text style={{ color: 'white', textAlign: 'center', fontSize: 18 }}>Pré-lista</Text>
                 <Text style={styles.totalPrice}><Icon name='shopping-cart' size={27} color='lightgreen' />   {format(totalPrice)}</Text>
                 <Table>
                     <Row data={['Item', 'Qtd', 'ValUnid(R$)', 'Total(R$)']} widthArr={[120, 60, 100, 100]} textStyle={{ color: 'white', marginLeft: 20 }} />
                 </Table>
-                <Toast ref={ref => Toast.setRef(ref)} />
                 <ScrollView style={{ marginTop: 20 }}>
                     <Table>
                         {items.map((item, i) => (
@@ -329,8 +288,8 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         alignSelf: 'center',
         position: 'absolute',
-        width: 190,
-        left: 70
+        width: '70%',
+        right: '15%',
     },
     archiveIcon: {
         alignSelf: 'center',
@@ -340,7 +299,7 @@ const styles = StyleSheet.create({
     saveIcon: {
         alignSelf: 'center',
         position: 'absolute',
-        right: 70
+        right: 20
     },
     totalPrice: {
         color: 'white',
