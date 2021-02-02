@@ -9,7 +9,6 @@ import {
     View,
     ScrollView,
     ImageBackground,
-    Image,
 } from 'react-native'
 import Gradient from 'react-native-linear-gradient'
 import DropShadow from 'react-native-drop-shadow'
@@ -134,7 +133,7 @@ export default function OpenScreen({ navigation }) {
 
     return (
         <SafeAreaView style={styles.background}>
-            <ImageBackground blurRadius={2} imageStyle={{ opacity: 0.5 }} resizeMode='contain' source={image} style={{ width: '100%', height: '100%' }}>
+            <ImageBackground blurRadius={2} imageStyle={{ opacity: 0.4 }} resizeMode='contain' source={image} style={{ width: '100%', height: '100%' }}>
                 <Modal transparent={true} visible={isVisible}>
                     <View style={styles.backgroundModal}>
                         <Toast ref={ref => Toast.setRef(ref)} />
@@ -272,11 +271,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         alignSelf: 'center'
     },
-    button: {
-        fontFamily: 'Open Sans',
-        color: 'red',
-        fontSize: 17,
-    },
     header: {
         width: '100%',
         height: 70,
@@ -284,15 +278,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexDirection: 'row',
         marginBottom: 5
-    },
-    buttonContainer: {
-        width: 150,
-        height: 70,
-        alignItems: 'center',
-        borderRadius: 10,
-        marginBottom: 30,
-        justifyContent: 'center',
-        elevation: 15,
     },
     shadow: {
         shadowColor: 'black',
@@ -369,15 +354,4 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    selected: {
-        width: '95%',
-        height: 70,
-        marginTop: 5,
-        marginBottom: 5,
-        borderRadius: 4,
-        justifyContent: 'center',
-        backgroundColor: 'red',
-        alignSelf: 'center',
-        padding: 10,
-    }
 })

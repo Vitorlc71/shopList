@@ -1,17 +1,15 @@
 import React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack'
 import OpenScreen from '../component/OpenScreen'
 import CreateList from '../../App'
 import LoadSavedLists from '../component/LoadSavedLists'
 import LoadSelectedList from '../component/LoadSelectedList'
 import LoadedPreList from '../component/LoadedPreList'
 import { createDrawerNavigator, DrawerItem } from '@react-navigation/drawer'
-import { StyleSheet, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
 
-const Stack = createStackNavigator()
 const Drawer = createDrawerNavigator()
 
 const CustomDrawer = ({ navigation }) => {

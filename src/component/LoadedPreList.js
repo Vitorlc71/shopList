@@ -46,6 +46,7 @@ export default function LoadedPreList({ navigation, route }) {
 
     useEffect(() => {
         let isMounted = true
+
         const getLoadList = async () => {
             try {
                 const realm = await getRealm()
@@ -69,9 +70,12 @@ export default function LoadedPreList({ navigation, route }) {
 
     useEffect(() => {
         let isMounted = true
-        setTotalPrice(items.map(e => e.total).reduce((acc, curr) => {
-            return acc + curr
-        }, 0))
+
+        if (isMounted) {
+            setTotalPrice(items.map(e => e.total).reduce((acc, curr) => {
+                return acc + curr
+            }, 0))
+        }
 
         return () => isMounted = false
     }, [items])
@@ -168,47 +172,57 @@ export default function LoadedPreList({ navigation, route }) {
 
             <Modal transparent={true} visible={visibility}>
                 <View style={styles.background}>
-                    <Gradient colors={['#163F4D', '#609789']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.containerModal}>
+                    <View style={styles.containerModal}>
                         <DropShadow style={styles.shadow}>
                             <Gradient colors={['#163F4D', '#609789']} start={{ x: 1, y: 0 }} end={{ x: 0, y: 0 }} style={styles.headerNewEdit}>
+                                <Icon name='arrow-left' color='white' size={25} onPress={() => setVisibility(false)} style={{ position: 'absolute', left: 20, alignSelf: 'center', zIndex: 9 }} />
                                 <Text style={styles.text}>Novo Item</Text>
+                                <Icon name='check' color='white' size={25} onPress={saveNewTask} style={{ position: 'absolute', right: 20, alignSelf: 'center' }} />
                             </Gradient>
                         </DropShadow>
+
+                        <Text style={{ color: '#609789', textAlign: 'left', marginLeft: 20, marginTop: 20, fontSize: 15 }}>Nome</Text>
                         <TextInput style={styles.input} autoFocus placeholder='Descrição do item...' value={description} onChangeText={e => setDescription(e)} />
-                        <TextInput style={styles.input} keyboardType='numeric' keyboardAppearance='dark' placeholder='Quantidade...' value={quantidade} onChangeText={(e) => setQuantidade(e)} />
-                        <TextInput style={styles.input} keyboardType='decimal-pad' placeholder='Valor' value={price} onChangeText={e => setPrice(e)} />
-                        <View style={styles.buttons}>
-                            <TouchableWithoutFeedback onPress={() => setVisibility(false)}>
-                                <Text style={styles.saveCancel}>Cancelar</Text>
-                            </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback onPress={saveNewTask}>
-                                <Text style={styles.saveCancel}>Salvar</Text>
-                            </TouchableWithoutFeedback>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
+                            <View style={{ width: '40%', marginLeft: 20 }}>
+                                <Text style={{ color: '#609789', textAlign: 'left', marginTop: 10, fontSize: 15 }}>Quantidade</Text>
+                                <TextInput style={{ borderBottomWidth: 1, width: '100%' }} keyboardType='numeric' keyboardAppearance='dark' placeholder='0' value={quantidade} onChangeText={(e) => setQuantidade(e)} />
+                            </View>
+                            <View style={{ width: '40%', marginRight: 20 }}>
+                                <Text style={{ color: '#609789', textAlign: 'left', marginTop: 10, fontSize: 15 }}>Valor(R$)</Text>
+                                <TextInput style={{ borderBottomWidth: 1, width: '100%' }} keyboardType='decimal-pad' placeholder='0,00' value={price} onChangeText={e => setPrice(e)} />
+                            </View>
                         </View>
-                    </Gradient>
+
+                    </View>
                 </View>
             </Modal>
 
             <Modal transparent={true} visible={editVisibility}>
                 <View style={styles.background}>
-                    <Gradient colors={['#163F4D', '#609789']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.containerModal}>
+                    <View style={styles.containerModal}>
                         <DropShadow style={styles.shadow}>
                             <Gradient colors={['#163F4D', '#609789']} start={{ x: 1, y: 0 }} end={{ x: 0, y: 0 }} style={styles.headerNewEdit}>
+                                <Icon name='arrow-left' color='white' size={25} onPress={() => setEditVisibility(false)} style={{ position: 'absolute', left: 20, alignSelf: 'center', zIndex: 9 }} />
                                 <Text style={styles.text}>Editar</Text>
+                                <Icon name='check' color='white' size={25} onPress={saveEditTask} style={{ position: 'absolute', right: 20, alignSelf: 'center' }} />
                             </Gradient>
                         </DropShadow>
+
+                        <Text style={{ color: '#609789', textAlign: 'left', marginLeft: 20, marginTop: 20, fontSize: 15 }}>Nome</Text>
                         <TextInput style={styles.input} autoFocus placeholder='Descrição do item...' value={newDesc} onChangeText={e => setNewDesc(e)} />
-                        <TextInput style={styles.input} keyboardType='numeric' ty placeholder='Quantidade...' value={newQtd} onChangeText={e => setNewQtd(e)} />
-                        <TextInput style={styles.input} keyboardType='numeric' placeholder='Valor' value={newPrice} onChangeText={e => setNewPrice(e)} />
-                        <View style={styles.buttons}>
-                            <TouchableWithoutFeedback onPress={() => setEditVisibility(false)}>
-                                <Text style={styles.saveCancel}>Cancelar</Text>
-                            </TouchableWithoutFeedback>
-                            <TouchableWithoutFeedback onPress={saveEditTask}>
-                                <Text style={styles.saveCancel}>Salvar</Text>
-                            </TouchableWithoutFeedback>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
+                            <View style={{ width: '40%', marginLeft: 20 }}>
+                                <Text style={{ color: '#609789', textAlign: 'left', marginTop: 10, fontSize: 15 }}>Quantidade</Text>
+                                <TextInput style={{ borderBottomWidth: 1, width: '100%' }} keyboardType='numeric' keyboardAppearance='dark' placeholder='0' value={newQtd} onChangeText={(e) => setNewQtd(e)} />
+                            </View>
+                            <View style={{ width: '40%', marginRight: 20 }}>
+                                <Text style={{ color: '#609789', textAlign: 'left', marginTop: 10, fontSize: 15 }}>Valor(R$)</Text>
+                                <TextInput style={{ borderBottomWidth: 1, width: '100%' }} keyboardType='decimal-pad' placeholder='0,00' value={newPrice} onChangeText={e => setNewPrice(e)} />
+                            </View>
                         </View>
-                    </Gradient>
+
+                    </View>
                 </View>
             </Modal>
 
@@ -235,13 +249,13 @@ export default function LoadedPreList({ navigation, route }) {
                 <Text style={{ color: 'white', textAlign: 'center', fontSize: 18 }}>Pré-lista</Text>
                 <Text style={styles.totalPrice}><Icon name='shopping-cart' size={27} color='lightgreen' />   {format(totalPrice)}</Text>
                 <Table>
-                    <Row data={['Item', 'Qtd', 'ValUnid(R$)', 'Total(R$)']} widthArr={[120, 60, 100, 100]} textStyle={{ color: 'white', marginLeft: 20 }} />
+                    <Row data={['Item', 'Qtd', 'ValUnid', 'Total']} widthArr={[120, 60, 100, 100]} textStyle={{ color: 'yellow', marginLeft: 20, fontSize: 16 }} />
                 </Table>
                 <ScrollView style={{ marginTop: 20 }}>
                     <Table>
                         {items.map((item, i) => (
                             <TouchableWithoutFeedback key={i} onPress={() => handleListItem(item)} onLongPress={() => deleteItem(item)}>
-                                <Row data={[item.description, item.quantidade, format(item.price), format(Number(item.quantidade) * Number(item.price))]} widthArr={[120, 60, 100, 100]} textStyle={item.price != 0 ? styles.buy : styles.items} />
+                                <Row data={[item.description, item.quantidade, format(item.price), format(Number(item.quantidade) * Number(item.price))]} widthArr={[120, 60, 103, 105]} textStyle={item.price != 0 ? styles.buy : styles.items} />
                             </TouchableWithoutFeedback>
                         ))}
                     </Table>
@@ -291,11 +305,6 @@ const styles = StyleSheet.create({
         width: '70%',
         right: '15%',
     },
-    archiveIcon: {
-        alignSelf: 'center',
-        position: 'absolute',
-        right: 20
-    },
     saveIcon: {
         alignSelf: 'center',
         position: 'absolute',
@@ -312,9 +321,10 @@ const styles = StyleSheet.create({
     buy: {
         fontFamily: 'Open Sans',
         color: 'lightgreen',
-        fontSize: 15,
+        fontSize: 16,
         marginLeft: 20,
-        marginBottom: 10
+        marginBottom: 10,
+        textDecorationLine: 'line-through'
     },
     items: {
         fontFamily: 'Open Sans',
@@ -339,17 +349,19 @@ const styles = StyleSheet.create({
         right: 30
     },
     containerModal: {
-        alignItems: 'center',
         marginTop: 0,
         width: '100%',
-        height: 320
+        height: 320,
+        backgroundColor: 'white'
     },
     input: {
-        width: '100%',
-        textAlign: 'center',
+        width: '90%',
+        textAlign: 'left',
         fontFamily: 'Open Sans',
-        fontSize: 20,
-        color: 'white'
+        fontSize: 15,
+        color: 'gray',
+        borderBottomWidth: 1,
+        alignSelf: 'center'
     },
     headerNewEdit: {
         alignItems: 'center',
@@ -359,14 +371,6 @@ const styles = StyleSheet.create({
     text: {
         color: 'white',
         fontSize: 20
-    },
-    buttons: {
-        flex: 1,
-        position: 'absolute',
-        bottom: 30,
-        flexDirection: 'row',
-        width: '100%',
-        justifyContent: 'space-around'
     },
     saveCancel: {
         fontFamily: 'Open Sans',

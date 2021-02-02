@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, LogBox } from 'react-native'
+import { StyleSheet, Text, View, LogBox, BackHandler } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
-import { Table, Row } from 'react-native-table-component'
 import DropShadow from 'react-native-drop-shadow'
 import Gradient from 'react-native-linear-gradient'
 import Intl from 'intl'
@@ -29,6 +28,18 @@ export default function LoadSelectedList({ route, navigation }) {
             setDate(route.params.titulo.date)
             setTotal(route.params.titulo.total)
 
+            BackHandler.addEventListener('hardwareBackPress', () => {
+                navigation.dispatch(CommonActions.reset({
+                    index: 1,
+                    routes: [
+                        { name: 'Início' },
+                        { name: 'Listas Salvas' },
+                    ]
+                }
+                ))
+                return true
+            })
+
         }
         getList()
 
@@ -53,18 +64,22 @@ export default function LoadSelectedList({ route, navigation }) {
             <Text style={styles.text}>Lista:   {title}</Text>
             <Text style={styles.text}>Data:   {date}</Text>
             <View style={styles.separate}></View>
-            <Table>
-                <Row textStyle={styles.tableTitle} data={['Item', 'Qtd.', 'Valor']} widthArr={[170, 100, 80]} />
-            </Table>
+            <View style={{ flexDirection: 'row', marginBottom: 12, alignItems: 'center', justifyContent: 'center', marginTop: 8 }}>
+                <Text style={{ position: 'absolute', left: 20, fontWeight: 'bold', fontSize: 18 }}>Item</Text>
+                <Text style={{ position: 'absolute', fontWeight: 'bold', fontSize: 18 }}>Qtd.</Text>
+                <Text style={{ position: 'absolute', right: 20, fontWeight: 'bold', fontSize: 18 }}>Valor</Text>
+            </View>
             <View style={styles.separate}></View>
             <ScrollView>
-                <Table style={{ width: '90%', alignSelf: 'center' }}>
-                    {listName.map((list, i) => {
-                        return (
-                            <Row data={[list.description, list.quantidade, format(list.price)]} widthArr={[180, 90, 100]} style={styles.gridList} textStyle={styles.listItem} key={i} />
-                        )
-                    })}
-                </Table>
+                {listName.map((list, i) => {
+                    return (
+                        <View style={{ flexDirection: 'row', marginBottom: 12, alignItems: 'center', justifyContent: 'center', marginTop: 8 }} key={i}>
+                            <Text style={{ position: 'absolute', left: 20 }}>{list.description}</Text>
+                            <Text style={{ position: 'absolute' }}>{list.quantidade}</Text>
+                            <Text style={{ position: 'absolute', right: 20 }}>{format(list.price)}</Text>
+                        </View>
+                    )
+                })}
                 <View style={styles.separate}></View>
                 <View style={styles.totalContainer}>
                     <Text style={styles.total}>Valor total:</Text><Text style={styles.total}>{format(total)}</Text>
@@ -83,7 +98,7 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'black',
-        fontSize: 15,
+        fontSize: 17,
         fontFamily: 'Arial',
         marginLeft: 20,
         fontWeight: 'bold'
@@ -91,19 +106,6 @@ const styles = StyleSheet.create({
     back: {
         position: 'absolute',
         left: 20
-    },
-    listItem: {
-        color: 'black',
-        fontSize: 15,
-        fontFamily: 'Arial',
-        textAlign: 'left'
-    },
-    title: {
-        color: 'black',
-        fontSize: 17,
-        fontFamily: 'Arial',
-        textAlign: 'center',
-        marginBottom: 20
     },
     header: {
         backgroundColor: 'darkblue',
@@ -121,20 +123,10 @@ const styles = StyleSheet.create({
         width: '90%',
         alignSelf: 'center'
     },
-    tableTitle: {
-        marginLeft: 20,
-        fontSize: 17,
-        fontWeight: 'bold'
-    },
     total: {
         fontSize: 17,
         fontWeight: 'bold',
         textAlign: 'right'
-    },
-    table: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginRight: 20
     },
     totalContainer: {
         flexDirection: 'row',
@@ -152,7 +144,4 @@ const styles = StyleSheet.create({
         width: '100%',
         shadowRadius: 4
     },
-    gridList: {
-
-    }
 })
