@@ -64,7 +64,7 @@ export default function index() {
     return (
         <MyContext.Provider value={currentTheme}>
             <NavigationContainer>
-                <Drawer.Navigator drawerContent={CustomDrawer} initialRouteName='Início'>
+                <Drawer.Navigator drawerContent={CustomDrawer} initialRouteName='SplashScreen'>
                     <Drawer.Screen name='Início' component={OpenScreen} />
                     <Drawer.Screen name='Listas Salvas' component={LoadSavedLists} />
                     <Drawer.Screen name='CreateList' component={CreateList} />
