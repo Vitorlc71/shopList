@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   TextInput,
   ScrollView,
-  Alert,
+  ToastAndroid,
 } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import moment from 'moment'
@@ -21,9 +21,6 @@ import Gradient from 'react-native-linear-gradient'
 import { Table, Row } from 'react-native-table-component'
 import DropShadow from 'react-native-drop-shadow'
 import { CommonActions } from '@react-navigation/native'
-import Toast from 'react-native-toast-message'
-
-
 
 export default function App({ navigation, route }) {
 
@@ -75,10 +72,13 @@ export default function App({ navigation, route }) {
       setqtd()
       setPrice()
     } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Campo descrição não pode ficar vazio!'
-      })
+      ToastAndroid.showWithGravityAndOffset(
+        'Campo descrição não pode ficar vazio.',
+        ToastAndroid.LONG,
+        ToastAndroid.TOP,
+        0,
+        100
+      )
     }
   }
 
@@ -103,10 +103,13 @@ export default function App({ navigation, route }) {
       setTasks([...filteredTask, editedTask])
       setEditVisibility(false)
     } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Campo descrição não pode ficar vazio!'
-      })
+      ToastAndroid.showWithGravityAndOffset(
+        'Campo descrição não pode ficar vazio.',
+        ToastAndroid.LONG,
+        ToastAndroid.TOP,
+        0,
+        100
+      )
     }
   }
 
@@ -147,6 +150,13 @@ export default function App({ navigation, route }) {
         ]
       }
       ))
+      ToastAndroid.showWithGravityAndOffset(
+        'Lista criada. Continue editando sua lista',
+        ToastAndroid.LONG,
+        ToastAndroid.TOP,
+        0,
+        100
+    )
 
     } catch (error) {
       console.log(error)
@@ -166,7 +176,6 @@ export default function App({ navigation, route }) {
                 <Icon name='check' color='white' size={25} onPress={saveNewTask} style={{ position: 'absolute', right: 20, alignSelf: 'center' }} />
               </Gradient>
             </DropShadow>
-            <Toast ref={ref => Toast.setRef(ref)} />
             <Text style={{ color: '#609789', textAlign: 'left', marginLeft: 20, marginTop: 20, fontSize: 15 }}>Nome</Text>
             <TextInput style={styles.input} autoFocus placeholder='Descrição do item...' value={value} onChangeText={e => setValue(e)} />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
@@ -237,7 +246,6 @@ export default function App({ navigation, route }) {
             <Icon style={styles.saveIcon} name='save' size={30} color='lightgreen' onPress={savePreList} />
           </Gradient>
         </DropShadow>
-        <Toast ref={ref => Toast.setRef(ref)} />
         <Text style={{ color: 'white', fontSize: 18, textAlign: 'center' }}>Nova lista</Text>
         <Text style={styles.totalPrice}><Icon name='shopping-cart' size={27} color='lightgreen' />   {format(totalPrice)}</Text>
         <Table>

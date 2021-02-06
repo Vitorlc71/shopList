@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 import { CommonActions } from '@react-navigation/native'
 import { useFocusEffect } from '@react-navigation/native'
 import image from '../../img/arquivarRedim1.png'
+import MyContext from './MyContext'
 
 
 export default function LoadSavedLists({ navigation }) {
@@ -73,44 +74,46 @@ export default function LoadSavedLists({ navigation }) {
             titulo: list
         })
     }
-    
-    return (
-        <SafeAreaView style={styles.background}>
-            <ImageBackground blurRadius={2} imageStyle={{ opacity: 0.3 }} resizeMode='contain' style={{ width: '100%', height: '100%' }} source={image}>
-                <DropShadow style={styles.shadow}>
-                    <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
-                        <Icon style={styles.backIcon} name='arrow-left' size={25} color='white' onPress={() => navigation.dispatch(CommonActions.reset({
-                            index: 0,
-                            routes: [
-                                { name: 'Início' },
-                                { name: 'Listas Salvas' },
-                            ]
-                        }
-                        ))} />
-                        <Text style={styles.text}>Armazenadas</Text>
-                    </Gradient>
-                </DropShadow>
 
-                <ScrollView style={{ width: '100%' }}>
-                    {lists.map((list, i) => {
-                        return (
-                            <DropShadow key={i} style={styles.shadowItem}>
-                                <View style={styles.listItem}>
-                                    <TouchableWithoutFeedback onLongPress={() => handleDelete(list.id)} onPress={() => selectedList(list)}>
-                                        <View style={styles.containerList}>
-                                            <Text style={styles.list}>{list.titulo}</Text>
-                                            <Text style={styles.dateList}>Data: {list.date}</Text>
-                                            <Text style={styles.dateList}>Itens: {list.items.length}</Text>
-                                            <Text style={styles.dateList}>Total: {format(list.total)}</Text>
-                                        </View>
-                                    </TouchableWithoutFeedback>
-                                </View>
-                            </DropShadow>
-                        )
-                    })}
-                </ScrollView>
-            </ImageBackground>
-        </SafeAreaView>
+    return (
+        <MyContext.Consumer>
+            {value => (<SafeAreaView style={styles.background}>
+                <ImageBackground blurRadius={2} imageStyle={{ opacity: 0.3 }} resizeMode='contain' style={{ width: '100%', height: '100%' }} source={image}>
+                    <DropShadow style={styles.shadow}>
+                        <Gradient colors={value} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
+                            <Icon style={styles.backIcon} name='arrow-left' size={25} color='white' onPress={() => navigation.dispatch(CommonActions.reset({
+                                index: 0,
+                                routes: [
+                                    { name: 'Início' },
+                                    { name: 'Listas Salvas' },
+                                ]
+                            }
+                            ))} />
+                            <Text style={styles.text}>Armazenadas</Text>
+                        </Gradient>
+                    </DropShadow>
+
+                    <ScrollView style={{ width: '100%' }}>
+                        {lists.map((list, i) => {
+                            return (
+                                <DropShadow key={i} style={styles.shadowItem}>
+                                    <View style={styles.listItem}>
+                                        <TouchableWithoutFeedback onLongPress={() => handleDelete(list.id)} onPress={() => selectedList(list)}>
+                                            <View style={styles.containerList}>
+                                                <Text style={styles.list}>{list.titulo}</Text>
+                                                <Text style={styles.dateList}>Data: {list.date}</Text>
+                                                <Text style={styles.dateList}>Itens: {list.items.length}</Text>
+                                                <Text style={styles.dateList}>Total: {format(list.total)}</Text>
+                                            </View>
+                                        </TouchableWithoutFeedback>
+                                    </View>
+                                </DropShadow>
+                            )
+                        })}
+                    </ScrollView>
+                </ImageBackground>
+            </SafeAreaView>)}
+        </MyContext.Consumer>
     )
 }
 
@@ -177,7 +180,7 @@ const styles = StyleSheet.create({
         right: 170
     },
     containerList: {
-        
+
     },
     dateList: {
         color: 'gray',

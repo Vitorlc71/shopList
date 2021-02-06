@@ -9,14 +9,17 @@ import {
     View,
     ScrollView,
     ImageBackground,
+    ToastAndroid,
+    StatusBar,
+    TouchableWithoutFeedback,
 } from 'react-native'
 import Gradient from 'react-native-linear-gradient'
 import DropShadow from 'react-native-drop-shadow'
-import Toast from 'react-native-toast-message'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import getRealm from './DatabaseRealm'
 import { useFocusEffect } from '@react-navigation/native'
 import image from '../../img/carrinhoRed3.png'
+import MyContext from './MyContext'
 
 export default function OpenScreen({ navigation }) {
 
@@ -62,6 +65,15 @@ export default function OpenScreen({ navigation }) {
             realm.write(() => {
                 realm.delete(selectedList)
             })
+
+            ToastAndroid.showWithGravityAndOffset(
+                'Lista deletada.',
+                ToastAndroid.LONG,
+                ToastAndroid.TOP,
+                0,
+                100
+            )
+
         } catch (error) {
             console.log(error)
         }
@@ -95,6 +107,13 @@ export default function OpenScreen({ navigation }) {
                 realm.delete(toRemove[0])
             })
 
+            ToastAndroid.showWithGravityAndOffset(
+                'Lista armazenada.',
+                ToastAndroid.LONG,
+                ToastAndroid.TOP,
+                0,
+                100
+            )
 
         } catch (error) {
             console.log(error)
@@ -132,118 +151,97 @@ export default function OpenScreen({ navigation }) {
     }
 
     return (
-        <SafeAreaView style={styles.background}>
-            <ImageBackground blurRadius={2} imageStyle={{ opacity: 0.4 }} resizeMode='contain' source={image} style={{ width: '100%', height: '100%' }}>
-                <Modal transparent={true} visible={isVisible}>
-                    <View style={styles.backgroundModal}>
-                        <Toast ref={ref => Toast.setRef(ref)} />
-                        <View style={styles.modalView}>
-                            <Text style={{ color: 'white', textAlign: 'center', fontSize: 20, marginTop: 10 }}>Nova lista</Text>
-                            <TextInput style={styles.textInput} autoFocus={true} placeholder='Nome da lista' value={newName} onChangeText={(e) => setNewName(e)} />
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                <TouchableOpacity onPress={() => {
-                                    setIsVisible(false)
-                                    setNewName()
-                                }}>
-                                    <Text style={styles.closeModal}>Cancelar</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity activeOpacity={0.7} onPress={() => {
-                                    if (newName) {
-                                        navigation.navigate('CreateList', {
-                                            nameList: newName
-                                        }
-                                        )
-                                        setNewName()
+        <MyContext.Consumer>
+            {value => (<SafeAreaView style={styles.background}>
+                <StatusBar backgroundColor='black' />
+                <ImageBackground blurRadius={2} imageStyle={{ opacity: 0.4 }} resizeMode='contain' source={image} style={{ width: '100%', height: '100%' }}>
+                    <Modal transparent={true} visible={isVisible}>
+                        <View style={styles.backgroundModal}>
+                            <View style={styles.modalView}>
+                                <Text style={{ color: 'white', textAlign: 'center', fontSize: 20, marginTop: 10 }}>Nova lista</Text>
+                                <TextInput style={styles.textInput} autoFocus={true} placeholder='Nome da lista' value={newName} onChangeText={(e) => setNewName(e)} />
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                                    <TouchableOpacity onPress={() => {
                                         setIsVisible(false)
-                                    } else {
-                                        Toast.show({
-                                            type: 'error',
-                                            text1: 'Informe um nome para sua lista.',
-                                            text2: 'Será mais fácil identificar posteriormente.'
-                                        })
-                                        return
-                                    }
-                                }}>
-                                    <Text style={styles.buttonCreate}>Criar lista</Text>
-                                </TouchableOpacity>
+                                        setNewName()
+                                    }}>
+                                        <Text style={styles.closeModal}>Cancelar</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                                        if (newName) {
+                                            navigation.navigate('CreateList', {
+                                                nameList: newName
+                                            }
+                                            )
+                                            setNewName()
+                                            setIsVisible(false)
+                                        } else {
+                                            ToastAndroid.showWithGravityAndOffset(
+                                                'Informe um nome para a sua lista.',
+                                                ToastAndroid.LONG,
+                                                ToastAndroid.TOP,
+                                                0,
+                                                100
+                                            )
+                                            return
+                                        }
+                                    }}>
+                                        <Text style={styles.buttonCreate}>Criar lista</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                </Modal>
+                    </Modal>
 
-                <DropShadow style={styles.shadow}>
-                    <Gradient colors={['#609789', '#163F4D']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
-                        <Icon style={{ position: 'absolute', left: 20 }} name='bars' size={30} color='white' onPress={() => navigation.toggleDrawer()} />
-                        <Text style={styles.title}>Minhas listas</Text>
-                    </Gradient>
-                </DropShadow>
+                    <DropShadow style={styles.shadow}>
+                        <Gradient colors={value} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.header}>
+                            <Icon style={{ position: 'absolute', left: 20 }} name='bars' size={30} color='white' onPress={() => navigation.toggleDrawer()} />
+                            <Text style={styles.title}>Minhas listas</Text>
+                        </Gradient>
+                    </DropShadow>
 
-                <Modal transparent={true} visible={modalButtons}>
-                    <View onTouchEndCapture={handleCloseOptionList} style={styles.saveDelButtonsContainer}>
-                        <DropShadow style={{
-                            shadowColor: 'black',
-                            shadowOffset: {
-                                width: 2,
-                                height: 4
-                            },
-                            shadowOpacity: 0.2,
-                            shadowRadius: 3,
-                            width: '100%'
-                        }}>
-                            <Text style={{
-                                backgroundColor: '#609789',
-                                width: '70%',
-                                height: 40,
-                                textAlign: 'center',
-                                borderTopLeftRadius: 7,
-                                borderTopRightRadius: 7,
-                                paddingTop: 10,
-                                fontSize: 20,
-                                color: 'white',
-                                alignSelf: 'center'
-                            }}>{title}</Text>
-                            <View style={{
-                                width: '70%',
-                                height: 120,
-                                backgroundColor: 'white',
-                                alignItems: 'center',
-                                justifyContent: 'space-around',
-                                flexDirection: 'row',
-                                borderBottomLeftRadius: 7,
-                                borderBottomRightRadius: 7,
-                                alignSelf: 'center'
-                            }}>
+                    <Modal transparent={true} visible={modalButtons}>
+                        <View onTouchEndCapture={handleCloseOptionList} style={styles.saveDelButtonsContainer}>
+                            <DropShadow style={styles.saveDeleteModalShadow}>
+                                <Text style={styles.saveDeleteTitle}>O que deseja fazer com a lista: {title}?</Text>
+                                <View style={styles.saveDeleteIcons}>
 
-                                <Icon onPress={handleStorage} name='archive' size={50} color='#609789' />
-                                <Icon onPress={deleteList} name='trash' size={50} color='#609789' />
-                            </View>
-                        </DropShadow>
-                    </View>
-                </Modal>
+                                    <Icon onPress={handleStorage} name='archive' size={50} color='#609789' />
+                                    <Icon onPress={deleteList} name='trash' size={50} color='#609789' />
+                                </View>
+                            </DropShadow>
+                        </View>
+                    </Modal>
 
-                <ScrollView style={styles.containerList}>
-                    {nameList.map((e, i) => {
-                        return (
-                            <TouchableOpacity activeOpacity={0.5} key={i} onLongPress={() => handleOptionsList(e)} onPress={() => navigation.navigate('LoadedPreList', {
-                                name: e.titulo
-                            })}>
-                                <DropShadow style={styles.shadowItemContainer}>
-                                    <View style={styles.containerShadow}>
-                                        <View style={{ flexDirection: 'row' }}>
-                                            <Text style={styles.nameList}>{e.titulo}</Text>
-                                            <Text style={{ color: '#163F4D', position: 'absolute', right: 10, fontSize: 20 }}>{e.items.filter(e => e.price != 0).length}/{e.items.length}</Text>
+                    <ScrollView style={styles.containerList}>
+                        {nameList.map((e, i) => {
+                            return (
+                                <TouchableOpacity activeOpacity={0.5} key={i} onLongPress={() => handleOptionsList(e)} onPress={() => navigation.navigate('LoadedPreList', {
+                                    name: e.titulo
+                                })}>
+                                    <DropShadow style={styles.shadowItemContainer}>
+                                        <View style={styles.containerShadow}>
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <Text style={styles.nameList}>{e.titulo}</Text>
+                                                <Text style={{ color: '#163F4D', position: 'absolute', right: 10, fontSize: 20 }}>{e.items.filter(e => e.price != 0).length}/{e.items.length}</Text>
+                                            </View>
+                                            <ProgressBar value2={e.items.length} value={e.items.filter(e => e.price != 0).length} />
                                         </View>
-                                        <ProgressBar value2={e.items.length} value={e.items.filter(e => e.price != 0).length} />
-                                    </View>
-                                </DropShadow>
-                            </TouchableOpacity>
-                        )
-                    })}
-                </ScrollView>
+                                    </DropShadow>
+                                </TouchableOpacity>
+                            )
+                        })}
+                    </ScrollView>
 
-                <Icon style={styles.icon} name='plus' size={50} color='#609789' onPress={() => setIsVisible(true)} />
-            </ImageBackground>
-        </SafeAreaView>
+                        <TouchableWithoutFeedback onPress={() => setIsVisible(true)}>
+                            <View style={styles.icon}>
+                                <Text style={{ color: 'white', fontSize: 30 }}>+</Text>
+                            </View>
+                        </TouchableWithoutFeedback>
+
+                </ImageBackground>
+            </SafeAreaView>)}
+        </MyContext.Consumer>
     )
 }
 
@@ -313,8 +311,14 @@ const styles = StyleSheet.create({
     },
     icon: {
         position: 'absolute',
-        bottom: 50,
-        right: 40
+        bottom: 70,
+        right: 30,
+        backgroundColor: '#609789',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     containerList: {
         width: '100%',
@@ -354,4 +358,37 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    saveDeleteModalShadow: {
+        shadowColor: 'black',
+        shadowOffset: {
+            width: 2,
+            height: 4
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        width: '100%'
+    },
+    saveDeleteTitle: {
+        backgroundColor: '#609789',
+        width: '70%',
+        height: 70,
+        textAlign: 'center',
+        borderTopLeftRadius: 7,
+        borderTopRightRadius: 7,
+        paddingTop: 10,
+        fontSize: 20,
+        color: 'white',
+        alignSelf: 'center'
+    },
+    saveDeleteIcons: {
+        width: '70%',
+        height: 120,
+        backgroundColor: 'white',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        flexDirection: 'row',
+        borderBottomLeftRadius: 7,
+        borderBottomRightRadius: 7,
+        alignSelf: 'center'
+    }
 })

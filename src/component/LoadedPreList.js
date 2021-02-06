@@ -8,8 +8,8 @@ import {
     TouchableWithoutFeedback,
     TextInput,
     ScrollView,
-    Alert,
-    LogBox
+    LogBox,
+    ToastAndroid
 } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import moment from 'moment'
@@ -20,7 +20,6 @@ import 'intl/locale-data/jsonp/pt-BR'
 import Gradient from 'react-native-linear-gradient'
 import { Table, Row } from 'react-native-table-component'
 import DropShadow from 'react-native-drop-shadow'
-import Toast from 'react-native-toast-message'
 import { CommonActions } from '@react-navigation/native'
 
 
@@ -107,11 +106,14 @@ export default function LoadedPreList({ navigation, route }) {
                 }, 'modified')
             })
 
-            Toast.show({
-                type: 'success',
-                text1: 'Pré-lista salva!',
-                topOffset: 50
-            })
+            ToastAndroid.showWithGravityAndOffset(
+                'Pré lista salva!',
+                ToastAndroid.LONG,
+                ToastAndroid.TOP,
+                0,
+                150
+            )
+
         } catch (error) {
             console.log(error)
         }
@@ -133,7 +135,13 @@ export default function LoadedPreList({ navigation, route }) {
             setQuantidade()
             setPrice()
         } else {
-            Alert.alert('Campo descrição não pode ficar em branco.')
+            ToastAndroid.showWithGravityAndOffset(
+                'Campo descrição não pode ficar vazio.',
+                ToastAndroid.LONG,
+                ToastAndroid.TOP,
+                0,
+                100
+            )
         }
     }
 
@@ -158,7 +166,13 @@ export default function LoadedPreList({ navigation, route }) {
             setItems([...filteredList, editedItems])
             setEditVisibility(false)
         } else {
-            Alert.alert('Campo descrição não pode ficar em branco.')
+            ToastAndroid.showWithGravityAndOffset(
+                'Campo descrição não pode ficar vazio.',
+                ToastAndroid.LONG,
+                ToastAndroid.TOP,
+                0,
+                100
+            )
         }
     }
 
@@ -245,7 +259,6 @@ export default function LoadedPreList({ navigation, route }) {
                         <Icon style={styles.saveIcon} name='save' size={30} color='lightgreen' onPress={savePreList} />
                     </Gradient>
                 </DropShadow>
-                <Toast ref={ref => Toast.setRef(ref)} />
                 <Text style={{ color: 'white', textAlign: 'center', fontSize: 18 }}>Pré-lista</Text>
                 <Text style={styles.totalPrice}><Icon name='shopping-cart' size={27} color='lightgreen' />   {format(totalPrice)}</Text>
                 <Table>

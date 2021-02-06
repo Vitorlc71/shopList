@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     },
     header: {
         backgroundColor: 'darkblue',
-        height: 60,
+        height: 70,
         justifyContent: 'center',
         marginBottom: 20,
         flexDirection: 'row',
